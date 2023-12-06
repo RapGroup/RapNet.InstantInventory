@@ -192,4 +192,255 @@ class Index {
             return $e->getMessage();
         }        
     }
+
+    /*
+    Request model: 
+
+    {
+      "shapes": [
+        "string"
+      ],
+      "sizeFrom": 0,
+      "sizeTo": 0,
+      "colorFrom": "string",
+      "colorTo": "string",
+      "clarityFrom": "string",
+      "clarityTo": "string",
+      "polishFrom": "string",
+      "polishTo": "string",
+      "symmetryFrom": "string",
+      "symmetryTo": "string",
+      "cutFrom": "string",
+      "cutTo": "string",
+      "labs": [
+        "string"
+      ],
+      "fluorescenceIntensities": [
+        "string"
+      ],
+      "fluorescenceIntensityFrom": "string",
+      "fluorescenceIntensityTo": "string",
+      "fluorescenceColors": [
+        "string"
+      ],
+      "culetSizes": [
+        "string"
+      ],
+      "fancyColors": [
+        "string"
+      ],
+      "eyeCleans": [
+        "string"
+      ],
+      "priceTotalFrom": 0,
+      "priceTotalTo": 0,
+      "measLengthFrom": 0,
+      "measLengthTo": 0,
+      "measWidthFrom": 0,
+      "measWidthTo": 0,
+      "measDepthFrom": 0,
+      "measDepthTo": 0,
+      "depthPercentFrom": 0,
+      "depthPercentTo": 0,
+      "tablePercentFrom": 0,
+      "tablePercentTo": 0,
+      "pageNumber": 0,
+      "pageSize": 0,
+      "girdleMin": "string",
+      "girdleMax": "string",
+      "sortBy": "string",
+      "sortDirection": "string",
+      "searchType": "string",
+      "fancyColorIntensityFrom": "string",
+      "fancyColorIntensityTo": "string",
+      "currencyCode": "string"
+    }
+
+    Response:
+    {
+      "searchResults": {
+        "diamondsReturned": 0,
+        "totalDiamondsFound": 0,
+        "sortedBy": "string",
+        "sortDirection": "string"
+      },
+      "diamonds": [
+        {
+          "diamondID": 0,
+          "shape": "string",
+          "size": 0,
+          "color": "string",
+          "fancyColorDominantColor": "string",
+          "fancyColorSecondaryColor": "string",
+          "fancyColorOvertone": "string",
+          "fancyColorIntensity": "string",
+          "clarity": "string",
+          "cut": "string",
+          "symmetry": "string",
+          "polish": "string",
+          "depthPercent": 0,
+          "tablePercent": 0,
+          "measLength": 0,
+          "measWidth": 0,
+          "measDepth": 0,
+          "girdleMin": "string",
+          "girdleMax": "string",
+          "girdleCondition": "string",
+          "culetSize": "string",
+          "culetCondition": "string",
+          "fluorColor": "string",
+          "fluorIntensity": "string",
+          "hasCertFile": true,
+          "lab": "string",
+          "currencyCode": "string",
+          "currencySymbol": "string",
+          "certNum": "string",
+          "stockNum": "string",
+          "videoURL": "string",
+          "hasVideo": true,
+          "eyeClean": "string",
+          "hasImageFile": true,
+          "hasSarineloupe": true,
+          "imageFile": "string",
+          "totalSalesPrice": 0,
+          "totalSalesPriceInCurrency": 0
+        }
+      ]
+    }
+    
+    */
+
+    public function getPublicDiamondsListings($token, $request)
+    {
+        try {
+            $stack = HandlerStack::create();
+            $stack->push(GuzzleRetryMiddleware::factory([
+                'max_retry_attempts' => 2,
+                'retry_on_status' => [429, 503, 500]
+            ]));
+            
+            $client = new GuzzleClient(['verify' => false, 'handler' => $stack]);
+            $url = "{$this->config['instant_inventory_url']}/Diamonds";
+
+            $request_obj = [
+              "request" => [
+                "body" => $request
+              ]				
+            ];
+
+            $response = $client->request('POST', $url, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'authorization' => "Bearer {$token}"
+                ],
+                'json' => $request_obj
+            ]);
+
+            return json_decode($response->getBody());
+        } catch (RequestException $e) {
+            return $e->getMessage();
+        }        
+    }
+
+    /*
+
+    Request:
+
+      {
+        "diamondId": 0
+      }
+
+    Response:
+
+      {
+        "diamond": {
+          "diamondID": 0,
+          "shape": "string",
+          "size": 0,
+          "color": "string",
+          "fancyColorDominantColor": "string",
+          "fancyColorSecondaryColor": "string",
+          "fancyColorOvertone": "string",
+          "fancyColorIntensity": "string",
+          "clarity": "string",
+          "cut": "string",
+          "symmetry": "string",
+          "polish": "string",
+          "depthPercent": 0,
+          "tablePercent": 0,
+          "measLength": 0,
+          "measWidth": 0,
+          "measDepth": 0,
+          "girdleMin": "string",
+          "girdleMax": "string",
+          "girdleCondition": "string",
+          "culetSize": "string",
+          "culetCondition": "string",
+          "fluorColor": "string",
+          "fluorIntensity": "string",
+          "hasCertFile": true,
+          "lab": "string",
+          "currencyCode": "string",
+          "currencySymbol": "string",
+          "certNum": "string",
+          "stockNum": "string",
+          "videoURL": "string",
+          "hasVideo": true,
+          "eyeClean": "string",
+          "hasImageFile": true,
+          "hasSarineloupe": true,
+          "imageFile": "string",
+          "totalSalesPrice": 0,
+          "totalSalesPriceInCurrency": 0,
+          "sarineFile": "string",
+          "totalPurchasePrice": 0,
+          "city": "string",
+          "country": "string"
+        },
+        "seller": {
+          "accountId": 0,
+          "company": "string",
+          "name": "string",
+          "email": "string",
+          "phone": "string",
+          "country": "string",
+          "state": "string",
+          "city": "string"
+        }
+      }
+
+    */
+
+
+    public function getSingleDiamond($token, $request)
+    {
+        try {
+            $stack = HandlerStack::create();
+            $stack->push(GuzzleRetryMiddleware::factory([
+                'max_retry_attempts' => 2,
+                'retry_on_status' => [429, 503, 500]
+            ]));
+            
+            $client = new GuzzleClient(['verify' => false, 'handler' => $stack]);
+            $url = "{$this->config['instant_inventory_url']}/SingleDiamond";
+
+            $request_obj = [
+              "request" => [
+                "body" => $request
+              ]				
+            ];
+
+            $response = $client->request('POST', $url, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'authorization' => "Bearer {$token}"
+                ],
+                'json' => $request_obj
+            ]);
+
+            return json_decode($response->getBody());
+        } catch (RequestException $e) {
+            return $e->getMessage();
+        }        
+    }
 }
